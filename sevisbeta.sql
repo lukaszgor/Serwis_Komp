@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.5
+-- version 4.7.4
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Czas generowania: 07 Maj 2019, 19:13
--- Wersja serwera: 10.1.38-MariaDB
--- Wersja PHP: 7.3.2
+-- Czas generowania: 07 Maj 2019, 19:44
+-- Wersja serwera: 10.1.26-MariaDB
+-- Wersja PHP: 7.1.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Baza danych: `servisbeta`
+-- Baza danych: `sevisbeta`
 --
 
 -- --------------------------------------------------------
@@ -108,7 +108,7 @@ CREATE TABLE `usterka` (
 
 CREATE TABLE `zgloszenie_usterki` (
   `id_zgloszenia` int(3) NOT NULL,
-  `ud_usterki` int(3) NOT NULL,
+  `id_usterki` int(3) NOT NULL,
   `id_sprzetu` int(3) NOT NULL,
   `data` date NOT NULL,
   `opis` varchar(10) COLLATE utf8_polish_ci NOT NULL,
@@ -120,40 +120,46 @@ CREATE TABLE `zgloszenie_usterki` (
 --
 
 --
--- Indeksy dla tabeli `klienci`
+-- Indexes for table `klienci`
 --
 ALTER TABLE `klienci`
   ADD PRIMARY KEY (`id_klienta`);
 
 --
--- Indeksy dla tabeli `odbior_sprzetu`
+-- Indexes for table `odbior_sprzetu`
 --
 ALTER TABLE `odbior_sprzetu`
-  ADD PRIMARY KEY (`id_odbioru`);
+  ADD PRIMARY KEY (`id_odbioru`),
+  ADD KEY `id_zgloszenia` (`id_zgloszenia`),
+  ADD KEY `id_pracownika` (`id_pracownika`);
 
 --
--- Indeksy dla tabeli `pracownicy`
+-- Indexes for table `pracownicy`
 --
 ALTER TABLE `pracownicy`
   ADD PRIMARY KEY (`id_pracownika`);
 
 --
--- Indeksy dla tabeli `sprzet`
+-- Indexes for table `sprzet`
 --
 ALTER TABLE `sprzet`
-  ADD PRIMARY KEY (`id_sprzetu`);
+  ADD PRIMARY KEY (`id_sprzetu`),
+  ADD KEY `id_klienta` (`id_klienta`);
 
 --
--- Indeksy dla tabeli `usterka`
+-- Indexes for table `usterka`
 --
 ALTER TABLE `usterka`
   ADD PRIMARY KEY (`id_usterki`);
 
 --
--- Indeksy dla tabeli `zgloszenie_usterki`
+-- Indexes for table `zgloszenie_usterki`
 --
 ALTER TABLE `zgloszenie_usterki`
-  ADD PRIMARY KEY (`id_zgloszenia`);
+  ADD PRIMARY KEY (`id_zgloszenia`),
+  ADD KEY `id_usterki` (`id_usterki`),
+  ADD KEY `id_sprzetu` (`id_sprzetu`),
+  ADD KEY `id_pracownika` (`id_pracownika`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -188,6 +194,30 @@ ALTER TABLE `sprzet`
 --
 ALTER TABLE `usterka`
   MODIFY `id_usterki` int(3) NOT NULL AUTO_INCREMENT;
+
+--
+-- Ograniczenia dla zrzutów tabel
+--
+
+--
+-- Ograniczenia dla tabeli `odbior_sprzetu`
+--
+ALTER TABLE `odbior_sprzetu`
+  ADD CONSTRAINT `odbior_sprzetu_ibfk_1` FOREIGN KEY (`id_zgloszenia`) REFERENCES `zgloszenie_usterki` (`id_zgloszenia`);
+
+--
+-- Ograniczenia dla tabeli `sprzet`
+--
+ALTER TABLE `sprzet`
+  ADD CONSTRAINT `sprzet_ibfk_1` FOREIGN KEY (`id_klienta`) REFERENCES `klienci` (`id_klienta`);
+
+--
+-- Ograniczenia dla tabeli `zgloszenie_usterki`
+--
+ALTER TABLE `zgloszenie_usterki`
+  ADD CONSTRAINT `zgloszenie_usterki_ibfk_1` FOREIGN KEY (`id_sprzetu`) REFERENCES `sprzet` (`id_sprzetu`),
+  ADD CONSTRAINT `zgloszenie_usterki_ibfk_2` FOREIGN KEY (`id_pracownika`) REFERENCES `pracownicy` (`id_pracownika`),
+  ADD CONSTRAINT `zgloszenie_usterki_ibfk_3` FOREIGN KEY (`id_usterki`) REFERENCES `usterka` (`id_usterki`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
